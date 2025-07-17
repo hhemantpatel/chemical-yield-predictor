@@ -1,3 +1,3 @@
 # chemical-yield-predictor
 
-by Hemant Patel
+by Hemant Patel(iit jodhpur)
