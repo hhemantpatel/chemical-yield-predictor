@@ -63,43 +63,49 @@ Copy code
 
 ---
 
+
 ## 🖥️ Run Locally
 
-### 1. Clone this repo
+### 1. Clone this repository
 
 ```bash
 git clone https://github.com/hhemantpatel/chemical-yield-predictor.git
 cd chemical-yield-predictor
-2. Install dependencies
-bash
-Copy code
+```
+
+### 2. Install dependencies
+
+```bash
 pip install -r requirements.txt
-3. Set up MySQL
-Create a database (e.g., chemical_data)
+```
 
-Run init_experiments.sql to create and populate the experiments table
+### 3. Set up MySQL
 
-4. Train the model
-bash
-Copy code
+- Create a database (e.g., `chemical_data`)
+- Run the SQL file to create and populate the table:
+
+```sql
+source init_experiments.sql;
+```
+
+### 4. Train the model
+
+```bash
 python model_training.py
-5. Run the app
-bash
-Copy code
+```
+
+### 5. Run the Streamlit app
+
+```bash
 streamlit run main.py
-🔍 Sample Prediction
-Enter values like:
+```
 
-Temperature: 90°C
+---
 
-Pressure: 1.2 atm
-
-Catalyst Concentration: 0.8 mol/L
-
-The model will output a predicted yield like: 72.34%
-
-Author
-Hemant Patel
-B.Tech Chemical Engineering, IIT Jodhpur
-GitHub: @hhemantpatel
+👨‍💻 Author
+Hemant Patel  
+B.Tech Chemical Engineering, IIT Jodhpur  
+GitHub: @hhemantpatel  
 Email: patelhemant.7509@gmail.com
+
+
