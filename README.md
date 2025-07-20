@@ -66,7 +66,7 @@ These plots illustrate how different experimental factors affect the reaction yi
 
 ### Effect of Temperature on Yield
 ![Temperature vs Yield](image/temp%20vs%20yield.png)
-![Temperature vs Yield](image/temp%20vs%20yield2.png)
+![Temperature vs Yield](image/temp%20vs%20yield%202.png)
 
 ### Effect of Pressure on Yield
 ![Pressure vs Yield](image/pressure%20vs%20yield.png)
