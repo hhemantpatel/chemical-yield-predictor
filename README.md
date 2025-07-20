@@ -61,6 +61,21 @@ Copy code
 
 - Real experimental dataset from: [Kaggle - Chemical Yield Dataset](https://www.kaggle.com/datasets/ayushbarnawal/chemical-yield)
 
+- 📊 Data Visualization  
+These plots illustrate how different experimental factors affect the reaction yield.
+
+### Effect of Temperature on Yield
+![Temperature vs Yield](image/temp%20vs%20yield.png)
+![Temperature vs Yield](image/temp%20vs%20yield2.png)
+
+### Effect of Pressure on Yield
+![Pressure vs Yield](image/pressure%20vs%20yield.png)
+![Pressure vs Yield](image/pressure%20vs%20yield2.png)
+
+### Effect of Catalyst Concentration on Yield
+![Catalyst vs Yield](image/catalyst%20con%20vs%20yield.png)
+![Catalyst vs Yield](image/catalyst%20con%20vs%20yield2.png)
+
 ---
 
 
