@@ -1,87 +1,59 @@
+# ===== main.py =====
 from matplotlib import pyplot as plt
 import mysql.connector
 import pandas as pd
 import seaborn as sns
-from sklearn.model_selection import train_test_split, GridSearchCV
-import sklearn as sk
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score
-from sklearn import svm
 from sklearn.svm import SVR
 from sklearn.neural_network import MLPRegressor
 import joblib
 
-# Step 1: Connect to MySQL
-conn = mysql.connector.connect(
-    host="localhost",        
-    user="root",             
+# Connect to MySQL
+db = mysql.connector.connect(
+    host="localhost",
+    user="root",
     password="Patel.7509",
-    database="experiments" 
+    database="experiments"
 )
 
-# Step 2: Query data into a Pandas DataFrame
-query = "SELECT * FROM data"
-df = pd.read_sql(query, conn)
-
-# Features and Target
+# Fetch data
+df = pd.read_sql("SELECT * FROM data", db)
 x_raw = df[['temperature', 'pressure', 'catalyst_concentration']]
-y = df["yeild"]
+y = df['yeild']
 
-# Scaling
+# Scale and split
 scaler = StandardScaler()
 x = scaler.fit_transform(x_raw)
 
-# Train-Test Split
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
 
-# ====================== KNN Regressor ======================
+# ----- KNN -----
 knn = KNeighborsRegressor(n_neighbors=20)
 knn.fit(x_train, y_train)
-p1 = knn.predict(x_test)
-mse_knn = mean_squared_error(y_test, p1)
-print("\n📘 KNN Regressor MSE:", mse_knn)
+print("KNN MSE:", mean_squared_error(y_test, knn.predict(x_test)))
 
-# ====================== Best SVR Model ======================
+# ----- SVR -----
 svr = SVR(kernel='rbf', C=10, gamma='scale', epsilon=1)
 svr.fit(x_train, y_train)
-pred1 = svr.predict(x_test)
-mse_svr = mean_squared_error(y_test, pred1)
-print("\n📗 SVR (Best Params) MSE:", mse_svr)
+print("SVR MSE:", mean_squared_error(y_test, svr.predict(x_test)))
 
-# ====================== Neural Network with GridSearchCV ======================
-param_grid = {
-    'hidden_layer_sizes': [(64, 32), (100, 50), (128, 64)],
-    'activation': ['relu', 'tanh'],
-    'solver': ['adam'],
-    'alpha': [0.0001, 0.001],
-    'learning_rate_init': [0.001, 0.005],
-    'max_iter': [2000]
-}
+# ----- Neural Net -----
+nn = MLPRegressor(
+    hidden_layer_sizes=(128, 64), activation='tanh', solver='adam',
+    alpha=0.001, learning_rate_init=0.001, max_iter=2000, random_state=42)
+nn.fit(x_train, y_train)
+print("Neural Net MSE:", mean_squared_error(y_test, nn.predict(x_test)))
 
-mlp = MLPRegressor(activation='tanh',alpha=0.001,hidden_layer_sizes=(128,64),learning_rate_init=0.001,max_iter=2000,solver='adam',random_state=42)
-mlp.fit(x_train, y_train)
+# Save models and scaler
+joblib.dump(knn, 'knn_model.pkl')
+joblib.dump(svr, 'svr_model.pkl')
+joblib.dump(nn, 'neural_net_model.pkl')
+joblib.dump(scaler, 'scaler.pkl')
 
-# Evaluate best neural net
-pred_mlp = mlp.predict(x_test)
-mse_mlp = mean_squared_error(y_test, pred_mlp)
-print("\n📕 Neural Network MSE (Best Grid Search):", mse_mlp)
+print("✅ All models and scaler saved!")
+print("✅ Models saved at:", pd.Timestamp.now())
 
-
-
-# Save KNN model
-joblib.dump(knn, "knn_model.pkl")
-
-# Save SVR model (with best params)
-joblib.dump(svr, "svr_model.pkl")
-
-# Save Neural Network (with best params)
-joblib.dump(mlp, "neural_net_model.pkl")
-
-print("✅ Models saved successfully!")
-
-
-# Close DB connection
-conn.close()
+db.close()
