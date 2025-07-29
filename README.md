@@ -1,19 +1,22 @@
 # 🧪 Chemical Yield Predictor
 
-A web-based machine learning project that predicts the yield of a chemical reaction based on experimental conditions such as temperature, pressure, and catalyst concentration. This project combines SQL database handling, Python data science tools, and a user-friendly Streamlit interface.
+A Streamlit-powered machine learning dashboard that predicts the **chemical reaction yield (%)** from experimental parameters like temperature, pressure, and catalyst concentration. Built with Python, MySQL, scikit-learn, and a user-friendly web interface.
 
 ---
 
 ## 🚀 Features
 
-- 📊 Predicts **reaction yield (%)** based on:
+- 📊 Predict **reaction yield (%)** from:
   - Temperature (°C)
   - Pressure (atm)
   - Catalyst Concentration (mol/L)
-- 🧠 Trained a regression model using real experimental data
-- 💾 Uses **MySQL** to store and query chemical data
-- ⚙️ Built with Python, scikit-learn, Streamlit, and Pandas
-- 🌐 Interactive interface using **Streamlit**
+- 🤖 Supports 3 trained ML models:
+  - K-Nearest Neighbors (KNN)
+  - Support Vector Regressor (SVR)
+  - Neural Network (MLP)
+- 📁 Fetches real-time data from **MySQL** database
+- 📉 Visualizes how yield is affected by each parameter
+- 🌐 Interactive web interface via **Streamlit**
 
 ---
 
@@ -21,112 +24,117 @@ A web-based machine learning project that predicts the yield of a chemical react
 
 | Layer              | Tools Used                                |
 |--------------------|--------------------------------------------|
-| 🧠 Machine Learning | scikit-learn, pandas, numpy               |
-| 🧪 Data Storage     | MySQL (with Python connector)             |
-| 📊 Frontend         | Streamlit (Python-based UI framework)     |
-| 📁 Others           | Git, VS Code, Matplotlib, Seaborn         |
+| 🧠 ML Models        | scikit-learn (KNN, SVR, MLPRegressor)       |
+| 📊 Frontend         | Streamlit                                  |
+| 🧪 Data Storage     | MySQL + Python connector                   |
+| 📁 Others           | Pandas, Matplotlib, Seaborn, Joblib       |
 
 ---
 
 ## 📂 Project Structure
 
+```
 chemical-yield-predictor/
 │
-├── main.py # Streamlit app
-├── model_training.py # Model training and evaluation
-├── yield_model.pkl # Saved regression model
-├── init_experiments.sql # SQL file to create and populate the table
-├── requirements.txt # Python dependencies
-├── README.md # This file
-└── chemical_data.csv # Dataset used
-
-yaml
-Copy code
+├── main.py              # Trains ML models, saves them
+├── predict.py           # Streamlit web app
+├── knn_model.pkl        # Saved KNN model
+├── svr_model.pkl        # Saved SVR model
+├── neural_net_model.pkl # Saved Neural Network model
+├── scaler.pkl           # Feature scaler
+├── init_experiments.sql # MySQL table schema + sample data
+├── requirements.txt     # Python dependencies
+├── chemical_data.csv    # Dataset (if not loaded from SQL)
+└── README.md            # You're reading this
+```
 
 ---
 
 ## ⚙️ How It Works
 
-1. Experimental data is stored in a MySQL table called `experiments`
-2. Python reads the data using `mysql-connector-python` and `pandas`
-3. A regression model is trained using:
-   - Features: temperature, pressure, catalyst concentration
-   - Target: yield_percent
-4. The trained model is saved using `joblib`
-5. The Streamlit app loads the model and provides sliders for live prediction
+1. MySQL stores reaction data in a table named `data` under DB `experiments`
+2. `main.py` fetches data, scales features, trains KNN/SVR/NN models
+3. Trained models and the scaler are saved as `.pkl` files
+4. `predict.py` runs a Streamlit interface:
+   - Accepts experimental inputs
+   - Lets you choose a model
+   - Returns the predicted reaction yield in %
 
 ---
 
-## 📥 Dataset Source
+## 📉 Model Performance (MSE)
 
-- Real experimental dataset from: [Kaggle - Chemical Yield Dataset](https://www.kaggle.com/datasets/ayushbarnawal/chemical-yield)
-
-- 📊 Data Visualization  
-These plots illustrate how different experimental factors affect the reaction yield.
-
-    
-
-### Effect of Temperature on Yield
-![Temperature vs Yield](image/temp%20vs%20yield.png)
-![Temperature vs Yield](image/temp%20vs%20yield%202.png)
-
-    
-
-### Effect of Pressure on Yield
-![Pressure vs Yield](image/pressure%20vs%20yield.png)
-![Pressure vs Yield](image/pressure%20vs%20yield2.png)
-
-    
-
-### Effect of Catalyst Concentration on Yield
-![Catalyst vs Yield](image/catalyst%20con%20vs%20yield.png)
-![Catalyst vs Yield](image/catalyst%20con%20vs%20yield2.png)
+| Model      | MSE (on test data) |
+|------------|--------------------|
+| KNN        | *(printed during training)* |
+| SVR        | *(printed during training)* |
+| Neural Net | *(printed during training)* |
 
 ---
 
+## 📈 Data Visualizations
 
-## 🖥️ Run Locally
+### 🔥 Effect of Temperature on Yield
+![Temperature vs Yield 1](image/temp%20vs%20yield.png)
+![Temperature vs Yield 2](image/temp%20vs%20yield%202.png)
 
-### 1. Clone this repository
+### 💨 Effect of Pressure on Yield
+![Pressure vs Yield 1](image/pressure%20vs%20yield.png)
+![Pressure vs Yield 2](image/pressure%20vs%20yield2.png)
 
+### 🧪 Effect of Catalyst Concentration on Yield
+![Catalyst vs Yield 1](image/catalyst%20con%20vs%20yield.png)
+![Catalyst vs Yield 2](image/catalyst%20con%20vs%20yield2.png)
+
+---
+
+## 🛠️ Run Locally
+
+### 1. Clone this repo
 ```bash
 git clone https://github.com/hhemantpatel/chemical-yield-predictor.git
 cd chemical-yield-predictor
 ```
 
-### 2. Install dependencies
-
+### 2. Install Python dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 3. Set up MySQL
 
-- Create a database (e.g., `chemical_data`)
-- Run the SQL file to create and populate the table:
-
+- Create DB `experiments`
+- Import SQL schema and data:
 ```sql
 source init_experiments.sql;
 ```
 
-### 4. Train the model
-
+### 4. Train models
 ```bash
-python model_training.py
+python main.py
 ```
 
-### 5. Run the Streamlit app
-
+### 5. Launch Streamlit app
 ```bash
-streamlit run main.py
+streamlit run predict.py
 ```
 
 ---
 
-👨‍💻 Author
-Hemant Patel  
-B.Tech Chemical Engineering, IIT Jodhpur  
-GitHub: @hhemantpatel  
-Email: patelhemant.7509@gmail.com
+## 📥 Dataset Source
 
+- **Kaggle**: [Chemical Yield Dataset](https://www.kaggle.com/datasets/ayushbarnawal/chemical-yield)
 
+---
+
+## 👨‍🔬 Author
+
+**Hemant Patel**  
+B.Tech, Chemical Engineering  
+IIT Jodhpur  
+📧 patelhemant.7509@gmail.com  
+🔗 [GitHub @hhemantpatel](https://github.com/hhemantpatel)
+
+---
+
+> ⭐ If you find this project useful, consider starring the repo!
