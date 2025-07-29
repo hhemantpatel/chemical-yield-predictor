@@ -88,6 +88,20 @@ chemical-yield-predictor/
 
 ---
 
+## 🖥️ Web App Preview
+
+### 🧪 Input Interface
+<img src="image/Screenshot 2025-07-29 151529.png" alt="Input Form" width="60%">
+
+### 🔍 Model Selection
+<img src="image/Screenshot 2025-07-29 151556.png" alt="Model Dropdown" width="50%">
+
+### 🎯 Prediction Result
+<img src="image/Screenshot 2025-07-29 151612.png" alt="Prediction Output" width="48%">
+
+
+---
+
 ## 🛠️ Run Locally
 
 ### 1. Clone this repo
