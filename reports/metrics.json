@@ -1,0 +1,74 @@
+{
+  "n_rows": 10000,
+  "frac_at_cap": 0.2682,
+  "best_model": "Tobit (censored linear)",
+  "models": {
+    "Linear (OLS)": {
+      "cv_rmse_mean": 5.271109549536114,
+      "cv_rmse_std": 0.07296994773251873,
+      "cv_mae_mean": 3.9555905833885925,
+      "cv_r2_mean": 0.8912112707627955,
+      "test_rmse": 5.180024593724764,
+      "test_mae": 3.857811818834431,
+      "test_r2": 0.8935603152269421,
+      "file": "linear.joblib"
+    },
+    "Tobit (censored linear)": {
+      "cv_rmse_mean": 4.180189827883391,
+      "cv_rmse_std": 0.09708995994557375,
+      "cv_mae_mean": 2.981145825332262,
+      "cv_r2_mean": 0.9315610488912052,
+      "test_rmse": 4.1684493634377295,
+      "test_mae": 2.9648118611411856,
+      "test_r2": 0.9310730602707539,
+      "file": "tobit.joblib"
+    },
+    "KNN (k=20)": {
+      "cv_rmse_mean": 4.351701813873747,
+      "cv_rmse_std": 0.06700216264645087,
+      "cv_mae_mean": 3.110960524658393,
+      "cv_r2_mean": 0.9258646831671907,
+      "test_rmse": 4.295093964312497,
+      "test_mae": 3.064050310940005,
+      "test_r2": 0.9268212014297643,
+      "file": "knn.joblib"
+    },
+    "SVR (RBF)": {
+      "cv_rmse_mean": 4.223006462333347,
+      "cv_rmse_std": 0.08732234145759475,
+      "cv_mae_mean": 3.004438150302546,
+      "cv_r2_mean": 0.9301645119590372,
+      "test_rmse": 4.195437895456341,
+      "test_mae": 2.9793641232481933,
+      "test_r2": 0.9301776390777661,
+      "file": "svr.joblib"
+    },
+    "Neural net (MLP)": {
+      "cv_rmse_mean": 4.196762683130703,
+      "cv_rmse_std": 0.08999988554585488,
+      "cv_mae_mean": 3.072048648834246,
+      "cv_r2_mean": 0.9310266042317201,
+      "test_rmse": 4.17281153734543,
+      "test_mae": 2.9871893621833925,
+      "test_r2": 0.9309287242867248,
+      "file": "neural_net.joblib"
+    },
+    "Gradient boosting": {
+      "cv_rmse_mean": 4.414316559332742,
+      "cv_rmse_std": 0.10332998333004843,
+      "cv_mae_mean": 3.1701240553317485,
+      "cv_r2_mean": 0.9236563845970128,
+      "test_rmse": 4.352548206686424,
+      "test_mae": 3.1223701617606,
+      "test_r2": 0.9248503233957354,
+      "file": "gradient_boosting.joblib"
+    }
+  },
+  "tobit_physical": {
+    "intercept": 14.728105288546715,
+    "slope_per_degC": 0.20118537844854673,
+    "slope_per_atm": 3.018592950398727,
+    "slope_per_mol_L": 79.9278070084663,
+    "noise_sigma": 5.004824759119558
+  }
+}

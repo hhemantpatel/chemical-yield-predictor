@@ -1,154 +1,89 @@
-# 🧪 Chemical Yield Predictor
+# Chemical Reaction Yield Predictor
 
-A Streamlit-powered machine learning dashboard that predicts the **chemical reaction yield (%)** from experimental parameters like temperature, pressure, and catalyst concentration. Built with Python, MySQL, scikit-learn, and a user-friendly web interface.
+Predicts reaction yield (%) from **temperature, pressure and catalyst concentration**, and finds the mildest operating conditions that reach a target yield. Comes with a Streamlit app, a reproducible training and evaluation pipeline, and tests.
 
----
+The main finding: **27 % of the experiments sit exactly at 100 % yield.** These are runs that reached complete conversion, so 100 % is a ceiling (a censored value), not an exact measurement. A **censored (Tobit) regression** that models the ceiling explicitly beats every black-box model tried. It is also the only model whose coefficients mean something physically.
 
-## 🚀 Features
+![Yield distribution](images/yield_distribution.png)
 
-- 📊 Predict **reaction yield (%)** from:
-  - Temperature (°C)
-  - Pressure (atm)
-  - Catalyst Concentration (mol/L)
-- 🤖 Supports 3 trained ML models:
-  - K-Nearest Neighbors (KNN)
-  - Support Vector Regressor (SVR)
-  - Neural Network (MLP)
-- 📁 Fetches real-time data from **MySQL** database
-- 📉 Visualizes how yield is affected by each parameter
-- 🌐 Interactive web interface via **Streamlit**
+## Results
 
----
+5-fold cross-validation on 80 % of the data, then one untouched 20 % hold-out set (`python train.py` regenerates this table in `reports/metrics.md`):
 
-## 🧰 Tech Stack
+| Model | CV RMSE (5-fold) | Test RMSE | Test MAE | Test R² |
+| --- | --- | --- | --- | --- |
+| Linear (OLS) | 5.271 ± 0.073 | 5.180 | 3.858 | 0.8936 |
+| **Tobit (censored linear)** | **4.180 ± 0.097** | **4.168** | **2.965** | **0.9311** |
+| KNN (k=20) | 4.352 ± 0.067 | 4.295 | 3.064 | 0.9268 |
+| SVR (RBF) | 4.223 ± 0.087 | 4.195 | 2.979 | 0.9302 |
+| Neural net (MLP 128-64) | 4.197 ± 0.090 | 4.173 | 2.987 | 0.9309 |
+| Gradient boosting | 4.414 ± 0.103 | 4.353 | 3.122 | 0.9249 |
 
-| Layer              | Tools Used                                |
-|--------------------|--------------------------------------------|
-| 🧠 ML Models        | scikit-learn (KNN, SVR, MLPRegressor)       |
-| 📊 Frontend         | Streamlit                                  |
-| 🧪 Data Storage     | MySQL + Python connector                   |
-| 📁 Others           | Pandas, Matplotlib, Seaborn, Joblib       |
+- The **Tobit model has 5 parameters** and matches or beats an MLP with about 9,000 weights. It cuts RMSE by **21 %** compared with ordinary linear regression.
+- **The noise floor:** run-to-run noise in the data is σ ≈ 5.0 %. If the Tobit model were exactly right, the lowest achievable RMSE would be about **4.20 %**, and the best models already reach it. More complex models cannot do better on this data; what remains is measurement noise, not missed structure.
+- **Plain least squares is biased.** It treats every 100 % row as an exact value, which flattens its slopes: it over-predicts low yields and under-predicts high ones.
 
----
+![Parity plots](images/parity_ols_vs_tobit.png)
 
-## 📂 Project Structure
+### The fitted model in physical units
 
 ```
-chemical-yield-predictor/
-│
-├── main.py              # Trains ML models, saves them
-├── predict.py           # Streamlit web app
-├── knn_model.pkl        # Saved KNN model
-├── svr_model.pkl        # Saved SVR model
-├── neural_net_model.pkl # Saved Neural Network model
-├── scaler.pkl           # Feature scaler
-├── init_experiments.sql # MySQL table schema + sample data
-├── requirements.txt     # Python dependencies
-├── chemical_data.csv    # Dataset (if not loaded from SQL)
-└── README.md            # You're reading this
+yield* = 14.73 + 0.201·T[°C] + 3.02·P[atm] + 79.9·C[mol/L]  + noise (σ = 5.0 %)
+observed yield = min(yield*, 100)
 ```
 
----
+Each +10 °C adds about 2 % yield, each +1 atm about 3 %, and each +0.1 mol/L of catalyst about 8 %. The model also gives the **probability of complete conversion**, P(yield* ≥ 100), for any operating point.
 
-## ⚙️ How It Works
+## Operating window
 
-1. MySQL stores reaction data in a table named `data` under DB `experiments`
-2. `main.py` fetches data, scales features, trains KNN/SVR/NN models
-3. Trained models and the scaler are saved as `.pkl` files
-4. `predict.py` runs a Streamlit interface:
-   - Accepts experimental inputs
-   - Lets you choose a model
-   - Returns the predicted reaction yield in %
+For a target yield, the app finds the lowest temperature (the energy cost) needed at each catalyst loading. Equivalently, it finds how much catalyst can be saved by running hotter. Example at 5 atm:
 
----
+![Operating window](images/operating_window.png)
 
-## 📉 Model Performance (MSE)
+## The app
 
-| Model      | MSE (on test data) |
-|------------|--------------------|
-| KNN        | *(printed during training)* |
-| SVR        | *(printed during training)* |
-| Neural Net | *(printed during training)* |
-
----
-
-## 📈 Data Visualizations
-
-### 🔥 Effect of Temperature on Yield
-![Temperature vs Yield 1](image/temp%20vs%20yield.png)
-![Temperature vs Yield 2](image/temp%20vs%20yield%202.png)
-
-### 💨 Effect of Pressure on Yield
-![Pressure vs Yield 1](image/pressure%20vs%20yield.png)
-![Pressure vs Yield 2](image/pressure%20vs%20yield2.png)
-
-### 🧪 Effect of Catalyst Concentration on Yield
-![Catalyst vs Yield 1](image/catalyst%20con%20vs%20yield.png)
-![Catalyst vs Yield 2](image/catalyst%20con%20vs%20yield2.png)
-
----
-
-## 🖥️ Web App Preview
-
-### 🧪 Input Interface
-<img src="image/Screenshot 2025-07-29 151529.png" alt="Input Form" width="60%">
-
-### 🔍 Model Selection
-<img src="image/Screenshot 2025-07-29 151556.png" alt="Model Dropdown" width="50%">
-
-### 🎯 Prediction Result
-<img src="image/Screenshot 2025-07-29 151612.png" alt="Prediction Output" width="48%">
-
-
----
-
-## 🛠️ Run Locally
-
-### 1. Clone this repo
 ```bash
-git clone https://github.com/hhemantpatel/chemical-yield-predictor.git
-cd chemical-yield-predictor
-```
-
-### 2. Install Python dependencies
-```bash
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+python train.py          # trains all models, writes models/ and reports/ (~1 min)
+streamlit run app.py
 ```
 
-### 3. Set up MySQL
+Tabs:
+- **Prediction:** expected yield, 90 % range for a single run, and probability of complete conversion. Warns when inputs fall outside the training range.
+- **Sensitivity:** yield against each input, with the other two held fixed.
+- **Operating window:** yield map over temperature × catalyst, plus the minimum temperature for a target yield.
+- **Model comparison:** the cross-validated metrics above.
 
-- Create DB `experiments`
-- Import SQL schema and data:
-```sql
-source init_experiments.sql;
+## Project layout
+
+```
+yieldpred/
+  data.py      loading (CSV default, optional MySQL via env vars), validation, training domain
+  tobit.py     censored-regression estimator (maximum likelihood, scikit-learn compatible)
+  models.py    all six models as Pipelines (each model carries its own scaler)
+train.py       cross-validation + hold-out evaluation, saves models and reports
+figures.py     README figures
+app.py         Streamlit app
+tests/         pytest: data checks, Tobit recovers known parameters, predictions stay in 0-100 %
 ```
 
-### 4. Train models
+Run the tests with `pytest -q`.
+
+### Optional MySQL source
+
 ```bash
-python main.py
+mysql -u <user> -p --local-infile=1 < init_experiments.sql
+YIELD_DATA_SOURCE=mysql YIELD_DB_USER=<user> YIELD_DB_PASSWORD=<pw> python train.py
 ```
 
-### 5. Launch Streamlit app
-```bash
-streamlit run predict.py
-```
+Credentials come only from environment variables; none are stored in the code.
 
----
+## Data
 
-## 📥 Dataset Source
+[Chemical yield dataset](https://www.kaggle.com/datasets/ayushbarnawal/chemical-yield) by Ayush Barnawal on Kaggle, 10,000 runs, redistributed in `data/` under the [Open Database License / Database Contents License](http://opendatacommons.org/licenses/dbcl/1.0/). Ranges: 50–300 °C, 1–10 atm, 0.01–0.5 mol/L. The data looks synthetic: yield is linear in the inputs plus Gaussian noise, clipped at 100 %. Conclusions about real reaction kinetics should not be drawn from it.
 
-- **Kaggle**: [Chemical Yield Dataset](https://www.kaggle.com/datasets/ayushbarnawal/chemical-yield)
+## Author
 
----
-
-## 👨‍🔬 Author
-
-**Hemant Patel**  
-B.Tech, Chemical Engineering  
-IIT Jodhpur  
-📧 patelhemant.7509@gmail.com  
-🔗 [GitHub @hhemantpatel](https://github.com/hhemantpatel)
-
----
-
-> ⭐ If you find this project useful, consider starring the repo!
+**Hemant Patel**, B.Tech Chemical Engineering, IIT Jodhpur
+[patelhemant.7509@gmail.com](mailto:patelhemant.7509@gmail.com) · [GitHub @hhemantpatel](https://github.com/hhemantpatel)
